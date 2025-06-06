@@ -1,33 +1,44 @@
 import PostCard from "@/components/common/PostCard";
 import Header from "@/components/layout/Header";
 
-const posts = [
-  {
-    title: "Post 1",
-    content: "This is the content of post 1",
-    userId: "1",
-  },
-  {
-    title: "Post 2",
-    content: "This is the content of post 2",
-    userId: "2",
-  },
-];
+interface Post {
+  id: number;
+  title: string;
+  body: string;
+  userId: number;
+}
 
-const Posts = () => {
+interface PostsPageProps {
+  posts: Post[];
+}
+
+export default function Posts({ posts }: PostsPageProps) {
   return (
     <>
-        <Header />
-
-      <section>
-        <h3>Welcome to Posts</h3>
-        {posts.map((item) => { 
-          return <PostCard title={item.title} content={item.content} key={item.userId} />
-        })}
+      <Header />
+      <section className="p-4 space-y-4">
+        <h3 className="text-xl font-semibold">Welcome to Posts</h3>
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            title={post.title}
+            content={post.body}
+            userId={post.userId.toString()}
+          />
+        ))}
       </section>
-    
     </>
   );
 }
 
-export default Posts;
+// ✅ THIS IS REQUIRED
+export async function getStaticProps() {
+  const res = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=10");
+  const posts: Post[] = await res.json();
+
+  return {
+    props: {
+      posts,
+    },
+  };
+}
